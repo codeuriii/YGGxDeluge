@@ -16,6 +16,9 @@ function createButton(element) {
         myButton.style.backgroundColor = "white"
         myButton.style.color = "#4975d1"
     })
+    myButton.addEventListener("click", () => {
+        addTorrentToDeluge(getTorrentLink(), getCategorie())
+    })
     element.parentElement.appendChild(myButton)
 }
 
@@ -37,6 +40,23 @@ function getCategorie() {
 
 function getTorrentLink() {
     return element.getAttribute("href")
+}
+
+function addTorrentToDeluge(link, label) {
+    // Récupérer les cookies (si applicable)
+    const cookies = document.cookie;
+
+    chrome.runtime.sendMessage(
+        {
+            action: "addTorrent",
+            link: link,
+            label: label,
+            cookies: cookies
+        },
+        response => {
+            console.log("Réponse du background:", response);
+        }
+    );
 }
 
 if (element) {
