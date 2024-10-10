@@ -1,0 +1,17 @@
+{
+    "manifest_version": 3,
+    "name": "YGG x Deluge",
+    "version": "1.0",
+    "description": "Une extension qui permet d'envoyer directement le torrent dans deluge sans le télécharger.",
+    "permissions": [
+      "activeTab",
+      "scripting"
+    ],
+    "content_scripts": [
+      {
+        "matches": ["https://www.ygg.re/*"],
+        "js": ["content.js"]
+      }
+    ]
+  }
+  
