@@ -6,15 +6,14 @@ function createButton(element) {
     myButton.className = "butt"
     myButton.textContent = "Envoyer a deluge"
     myButton.style.borderColor = "#4975d1"
-    myButton.style.color = "#4975d1"
+    myButton.style.color = "white"
+    console.log(element.parentElement.style.background)
     myButton.style.marginLeft = "5px"
     myButton.addEventListener("mouseenter", () => {
         myButton.style.backgroundColor = "#4975d1"
-        myButton.style.color = "white"
     })
     myButton.addEventListener("mouseleave", () => {
-        myButton.style.backgroundColor = "white"
-        myButton.style.color = "#4975d1"
+        myButton.style.backgroundColor = element.style.color
     })
     myButton.addEventListener("click", () => {
         addTorrentToDeluge(getTorrentLink(), getCategorie())
