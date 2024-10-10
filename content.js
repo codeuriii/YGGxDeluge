@@ -1,4 +1,3 @@
-console.log("Test injection du content script");
 
 const element = document.querySelector('a.butt');
 
@@ -21,9 +20,19 @@ function createButton(element) {
 }
 
 function getCategorie() {
+    const categories = {
+        "2183": "radarr",
+        "2184": "sonarr",
+        "2179": "sonarr",
+        "2178": "radarr",
+        "2148": "lidarr"
+    }
     const div = document.querySelector("div.tag")
     const regexp = /tag_subcat_(\d+)/
-    return div.className.match(regexp)[1]
+    const id = div.className.match(regexp)[1]
+    if (id in categories) {
+        return categories[id]
+    }
 }
 
 if (element) {
