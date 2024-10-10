@@ -24,25 +24,25 @@ async function connectToDeluge() {
         })
     });
 
-    console.log(response.body)
-    const data = await response.text();
+    const data = await response.json();
     return data.result;  // Renvoie `true` si l'authentification réussit
 }
 
 // Fonction pour ajouter un torrent avec l'URL et les cookies
 async function addTorrent(link, cookies) {
     const url = `${delugeConfig.host}:${delugeConfig.port}/json`;
-
-    const headers = {
-        "Content-Type": "application/json",
-        "Cookie": cookies  // Ajouter les cookies dans les en-têtes
-    };
+    getCfClearanceCookie("https://ygg.re").then(data => {
+        console.log(data)
+    })
 
     // Requête pour ajouter le torrent via Deluge
     const response = await fetch(url, {
         method: "POST",
-        mode: "no-cors",  // Ajout du mode CORS
-        headers: headers,
+        mode: "cors",
+        headers: {
+            "Content-Type": "application/json",
+            "Cookies": cookies
+        },
         body: JSON.stringify({
             method: "core.add_torrent_url",
             params: [link, {}], // L'URL et un objet vide pour les options
@@ -60,7 +60,7 @@ async function setLabel(torrentId, label) {
 
     const response = await fetch(url, {
         method: "POST",
-        mode: "no-cors",  // Ajout du mode CORS
+        mode: "cors",  // Ajout du mode CORS
         headers: {
             "Content-Type": "application/json"
         },
@@ -89,7 +89,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         }
 
         // Ajout du torrent avec l'URL et les cookies
-        const torrentId = await addTorrent(link, cookies);
+        const torrentId = await addTorrent("https://ygg.re" + link, 11010010);
         if (torrentId) {
             console.log("Torrent ajouté avec succès:", torrentId);
 
@@ -110,3 +110,8 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         }
     }
 });
+
+// Fonction pour récupérer le cookie cf_clearance
+async function getCfClearanceCookie(url) {
+    return await chrome.cookies.getAll({ domain: url })
+}
