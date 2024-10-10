@@ -35,6 +35,10 @@ function getCategorie() {
     }
 }
 
+function getTorrentLink() {
+    return element.getAttribute("href")
+}
+
 if (element) {
     createButton(element)
 }
