@@ -11,11 +11,11 @@ const delugeConfig = {
 async function connectToDeluge() {
     const url = `${delugeConfig.host}:${delugeConfig.port}/json`;
 
-    // Requête de connexion pour authentifier
     const response = await fetch(url, {
         method: "POST",
+        mode: "cors",  // Ajout du mode CORS
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         },
         body: JSON.stringify({
             method: "auth.login",
@@ -24,7 +24,8 @@ async function connectToDeluge() {
         })
     });
 
-    const data = await response.json();
+    console.log(response.body)
+    const data = await response.text();
     return data.result;  // Renvoie `true` si l'authentification réussit
 }
 
@@ -32,7 +33,6 @@ async function connectToDeluge() {
 async function addTorrent(link, cookies) {
     const url = `${delugeConfig.host}:${delugeConfig.port}/json`;
 
-    // Préparer les en-têtes avec les cookies
     const headers = {
         "Content-Type": "application/json",
         "Cookie": cookies  // Ajouter les cookies dans les en-têtes
@@ -41,6 +41,7 @@ async function addTorrent(link, cookies) {
     // Requête pour ajouter le torrent via Deluge
     const response = await fetch(url, {
         method: "POST",
+        mode: "no-cors",  // Ajout du mode CORS
         headers: headers,
         body: JSON.stringify({
             method: "core.add_torrent_url",
@@ -57,9 +58,9 @@ async function addTorrent(link, cookies) {
 async function setLabel(torrentId, label) {
     const url = `${delugeConfig.host}:${delugeConfig.port}/json`;
 
-    // Requête pour assigner un label à un torrent
     const response = await fetch(url, {
         method: "POST",
+        mode: "no-cors",  // Ajout du mode CORS
         headers: {
             "Content-Type": "application/json"
         },
