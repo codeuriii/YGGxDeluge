@@ -37,5 +37,4 @@ function getCategorie() {
 
 if (element) {
     createButton(element)
-    console.log(getCategorie())
 }
