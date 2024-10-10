@@ -7,7 +7,6 @@ function createButton(element) {
     myButton.textContent = "Envoyer a deluge"
     myButton.style.borderColor = "#4975d1"
     myButton.style.color = "white"
-    console.log(element.parentElement.style.background)
     myButton.style.marginLeft = "5px"
     myButton.addEventListener("mouseenter", () => {
         myButton.style.backgroundColor = "#4975d1"
