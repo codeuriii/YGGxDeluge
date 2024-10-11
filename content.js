@@ -50,9 +50,6 @@ function addTorrentToDeluge(link, label) {
             link: link,
             label: label,
             cookies: cookies
-        },
-        response => {
-            console.log("Réponse du background:", response);
         }
     );
 }

@@ -30,27 +30,46 @@ async function connectToDeluge() {
 
 // Fonction pour ajouter un torrent avec l'URL et les cookies
 async function addTorrent(link, cookies) {
-    const url = `${delugeConfig.host}:${delugeConfig.port}/json`;
-    getCfClearanceCookie("https://ygg.re").then(data => {
-        console.log(data)
-    })
-
-    // Requête pour ajouter le torrent via Deluge
-    const response = await fetch(url, {
-        method: "POST",
-        mode: "cors",
+    const torrentResponse = await fetch(link, {
+        method: 'GET',
         headers: {
-            "Content-Type": "application/json",
-            "Cookies": cookies
+            'Cookie': cookies
+        }
+    });
+
+    if (!torrentResponse.ok) {
+        throw new Error('Failed to download the torrent file from the indexer.');
+    }
+
+    // Lire le fichier torrent sous forme de blob
+    const torrentBlob = await torrentResponse.blob();
+
+    // Lire le blob en tant qu'ArrayBuffer
+    const arrayBuffer = await torrentBlob.arrayBuffer();
+
+    // Convertir l'ArrayBuffer en un tableau d'octets (bytes)
+    const torrentFileBytes = new Uint8Array(arrayBuffer);
+
+    // Convertir les octets en un tableau de base64 pour que Deluge les traite comme un fichier valide
+    const torrentBase64 = btoa(String.fromCharCode.apply(null, torrentFileBytes));
+
+    const url = `${delugeConfig.host}:${delugeConfig.port}/json`;
+
+    // Ajouter le torrent à Deluge en envoyant le fichier encodé en base64
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            method: "core.add_torrent_url",
-            params: [link, {}], // L'URL et un objet vide pour les options
+            method: 'core.add_torrent_file',
+            params: ["downloaded_torrent.torrent", torrentBase64, {}],
             id: 2
         })
     });
 
     const data = await response.json();
+    // console.log(await response.text())
     return data.result;  // Renvoie l'ID du torrent ajouté
 }
 
@@ -72,7 +91,7 @@ async function setLabel(torrentId, label) {
     });
 
     const data = await response.json();
-    return data.result;  // Renvoie `true` si le label est appliqué avec succès
+    return data.error;  // Renvoie `true` si le label est appliqué avec succès
 }
 
 // Écoute les messages envoyés depuis content.js
@@ -89,14 +108,14 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         }
 
         // Ajout du torrent avec l'URL et les cookies
-        const torrentId = await addTorrent("https://ygg.re" + link, 11010010);
+        const torrentId = await addTorrent("https://ygg.re" + link, await getCookie("ygg_", "https://ygg.re"));
         if (torrentId) {
             console.log("Torrent ajouté avec succès:", torrentId);
 
             // Ajout du label si disponible
             if (label) {
                 const labelSet = await setLabel(torrentId, label);
-                if (labelSet) {
+                if (!labelSet) {
                     console.log("Label ajouté:", label);
                 } else {
                     console.error("Erreur lors de l'ajout du label");
@@ -111,7 +130,17 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     }
 });
 
-// Fonction pour récupérer le cookie cf_clearance
-async function getCfClearanceCookie(url) {
-    return await chrome.cookies.getAll({ domain: url })
-}
+async function getCookie(cookieName, domainUrl) {
+    return await new Promise((resolve, reject) => {
+      // Utilisation de l'API chrome.cookies pour récupérer le cookie
+      chrome.cookies.get({ url: domainUrl, name: cookieName }, function(cookie) {
+            if (cookie) {
+                console.log(cookie.value)
+                resolve(cookie.value); // Retourne la valeur du cookie si trouvé
+            } else {
+                reject(`Cookie "${cookieName}" not found on domain ${domainUrl}`);
+            }
+      });
+    });
+  }
+  
