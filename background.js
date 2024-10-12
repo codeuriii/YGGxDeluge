@@ -97,7 +97,7 @@ async function setLabel(torrentId, label) {
 // Écoute les messages envoyés depuis content.js
 chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message.action === "addTorrent") {
-        const { link, label, cookies } = message;
+        const { link, label } = message;
 
         // Connexion à l'API de Deluge
         const connected = await connectToDeluge();
@@ -128,6 +128,11 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
             sendResponse({ status: "Erreur lors de l'ajout du torrent" });
         }
     }
+
+    // Prowlarr part
+    else if (message.action === "prowlarr") {
+        updateProwlarrIndexer()
+    }
 });
 
 async function getCookie(cookieName, domainUrl) {
@@ -142,4 +147,40 @@ async function getCookie(cookieName, domainUrl) {
             }
         });
     });
+}
+
+async function updateProwlarrIndexer() {
+    const cookie = `ygg_=${await getCookie("ygg_", "https://ygg.re")}`
+    fetch("http://192.168.1.253:9696/api/v1/indexer/11", {
+        headers: {
+            "X-Api-Key": "aba331ee587245008bf5c2e0f06f376c",
+            "Content-Type": "application/json"
+        }
+    }).then(response => response.json())
+    .then(data => {
+        let raw = data
+        for (const d of raw.fields) {
+            if (d.name === "cookie") {
+                d.value = cookie
+                break
+            }
+        }
+
+        fetch("http://192.168.1.253:9696/api/v1/indexer/11", {
+            headers: {
+                "X-Api-Key": "aba331ee587245008bf5c2e0f06f376c",
+                "Content-Type": "application/json"
+            },
+            method: "PUT",
+            body: JSON.stringify(raw)
+        }).then(response => response.text())
+        .then(data => {
+            if (data === 202) {
+                console.log("Prowlarr indexer updated!");
+            } else {
+                console.log(data)
+                console.error("battu")
+            }
+        })
+    })
 }

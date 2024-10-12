@@ -1,7 +1,7 @@
 import requests
 
 
-def update_prowlarr_cookie():
+def update_prowlarr_cookie(new_cookie_value):
     # Paramètres de connexion
     api_url = "http://192.168.1.253:9696/api/v1/indexer/11"  # ID de l'indexeur YggTorrent
     api_key = "aba331ee587245008bf5c2e0f06f376c"
@@ -70,3 +70,23 @@ def start_sonarr_rss_sync():
         print("La synchronisation RSS a été lancée avec succès.")
     else:
         print(f"Erreur lors du lancement de la synchronisation RSS : {response.status_code} - {response.text}")
+
+def get_base_64():
+    import base64
+    import pyperclip
+
+    # Step 1: Download image with requests (if you have a URL)
+    url = 'http://192.168.1.253:9696/Content/Images/logo.png'  # Replace with your image URL
+    response = requests.get(url)
+    image_data = response.content
+
+    # Step 2: Convert image to base64
+    base64_image = base64.b64encode(image_data).decode('utf-8')
+
+    # Step 3: Copy base64 string to clipboard using pyperclip
+    pyperclip.copy(base64_image)
+
+    # Notify the user
+    print("Base64 image copied to clipboard!")
+
+get_base_64()
