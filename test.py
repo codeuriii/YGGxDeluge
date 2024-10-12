@@ -54,4 +54,19 @@ def start_radarr_rss_sync():
     else:
         print(f"Erreur lors du lancement de la synchronisation RSS : {response.status_code} - {response.text}")
 
-
+def start_sonarr_rss_sync():
+    url = f"http://192.168.1.253:8989/api/v3/command"
+    headers = {
+        "X-API-Key": "901c405b91784cca8f25373bcdea455b",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "name": "RssSync"
+    }
+    
+    response = requests.post(url, headers=headers, json=data)
+    
+    if response.status_code == 201:
+        print("La synchronisation RSS a été lancée avec succès.")
+    else:
+        print(f"Erreur lors du lancement de la synchronisation RSS : {response.status_code} - {response.text}")
