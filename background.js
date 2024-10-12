@@ -177,9 +177,74 @@ async function updateProwlarrIndexer() {
         .then(data => {
             if (data.severity !== "error") {
                 console.log("Prowlarr indexer updated!")
+                startAllRssSync()
             } else {
                 console.log(data)
             }
         })
     })
+}
+
+function startRadarrRssSync() {
+    const url = "http://192.168.1.253:7878/api/v3/command";
+    const headers = {
+        "X-API-Key": "1f6e4a57b2ce462496883113d753abb0",
+        "Content-Type": "application/json"
+    };
+    const data = {
+        name: "RssSync"
+    };
+
+    fetch(url, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (response.status === 201) {
+            console.log("La synchronisation RSS de Radarr a été lancée avec succès.");
+        } else {
+            return response.text().then(text => {
+                console.log(`Erreur lors du lancement de la synchronisation RSS : ${response.status} - ${text}`);
+            });
+        }
+    })
+    .catch(error => {
+        console.log("Erreur de connexion : ", error);
+    });
+}
+
+function startSonarrRssSync() {
+    const url = "http://192.168.1.253:8989/api/v3/command";
+    const headers = {
+        "X-API-Key": "901c405b91784cca8f25373bcdea455b",
+        "Content-Type": "application/json"
+    };
+    const data = {
+        name: "RssSync"
+    };
+
+    fetch(url, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (response.status === 201) {
+            console.log("La synchronisation RSS de Sonarr a été lancée avec succès.");
+        } else {
+            return response.text().then(text => {
+                console.log(`Erreur lors du lancement de la synchronisation RSS : ${response.status} - ${text}`);
+            });
+        }
+    })
+    .catch(error => {
+        console.log("Erreur de connexion : ", error);
+    });
+}
+
+function startAllRssSync() {
+    startRadarrRssSync()
+    startSonarrRssSync()
+    console.log("RSS sync activated!")
 }
