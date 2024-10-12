@@ -150,7 +150,7 @@ async function getCookie(cookieName, domainUrl) {
 }
 
 async function updateProwlarrIndexer() {
-    const cookie = `ygg_=${await getCookie("ygg_", "https://ygg.re")}`
+    const cookie = `account_created=true; ygg_=${await getCookie("ygg_", "https://ygg.re")}`
     fetch("http://192.168.1.253:9696/api/v1/indexer/11", {
         headers: {
             "X-Api-Key": "aba331ee587245008bf5c2e0f06f376c",
@@ -175,7 +175,11 @@ async function updateProwlarrIndexer() {
             body: JSON.stringify(raw)
         }).then(response => response.text())
         .then(data => {
-            console.log(data)
+            if (data.severity !== "error") {
+                console.log("Prowlarr indexer updated!")
+            } else {
+                console.log(data)
+            }
         })
     })
 }
