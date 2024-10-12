@@ -175,12 +175,7 @@ async function updateProwlarrIndexer() {
             body: JSON.stringify(raw)
         }).then(response => response.text())
         .then(data => {
-            if (data === 202) {
-                console.log("Prowlarr indexer updated!");
-            } else {
-                console.log(data)
-                console.error("battu")
-            }
+            console.log(data)
         })
     })
 }
