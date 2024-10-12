@@ -37,6 +37,21 @@ def update_prowlarr_cookie():
         print(f"Erreur lors de la récupération des infos de l'indexeur : {response_get.status_code}")
 
 
-def start_rss_sync():
-    pass
+def start_radarr_rss_sync():
+    url = f"http://192.168.1.253:7878/api/v3/command"
+    headers = {
+        "X-API-Key": "1f6e4a57b2ce462496883113d753abb0",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "name": "RssSync"
+    }
+    
+    response = requests.post(url, headers=headers, json=data)
+    
+    if response.status_code == 201:
+        print("La synchronisation RSS a été lancée avec succès.")
+    else:
+        print(f"Erreur lors du lancement de la synchronisation RSS : {response.status_code} - {response.text}")
+
 
