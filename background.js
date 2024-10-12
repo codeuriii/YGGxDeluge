@@ -103,7 +103,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         const connected = await connectToDeluge();
         if (!connected) {
             console.error("Connexion à Deluge échouée");
-            sendResponse({status: "Erreur de connexion"});
+            sendResponse({ status: "Erreur de connexion" });
             return;
         }
 
@@ -122,25 +122,24 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
                 }
             }
 
-            sendResponse({status: "Torrent ajouté et label appliqué"});
+            sendResponse({ status: "Torrent ajouté et label appliqué" });
         } else {
             console.error("Erreur lors de l'ajout du torrent");
-            sendResponse({status: "Erreur lors de l'ajout du torrent"});
+            sendResponse({ status: "Erreur lors de l'ajout du torrent" });
         }
     }
 });
 
 async function getCookie(cookieName, domainUrl) {
     return await new Promise((resolve, reject) => {
-      // Utilisation de l'API chrome.cookies pour récupérer le cookie
-      chrome.cookies.get({ url: domainUrl, name: cookieName }, function(cookie) {
+        // Utilisation de l'API chrome.cookies pour récupérer le cookie
+        chrome.cookies.get({ url: domainUrl, name: cookieName }, function (cookie) {
             if (cookie) {
                 console.log(cookie.value)
                 resolve(cookie.value); // Retourne la valeur du cookie si trouvé
             } else {
                 reject(`Cookie "${cookieName}" not found on domain ${domainUrl}`);
             }
-      });
+        });
     });
-  }
-  
+}
