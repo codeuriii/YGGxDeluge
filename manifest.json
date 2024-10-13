@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "YGG x Deluge",
+    "name": "YGG+",
     "version": "1.0",
-    "description": "Une extension qui permet d'envoyer directement le torrent dans deluge sans le télécharger.",
+    "description": "Une extension qui permet d'envoyer directement le torrent dans deluge sans le télécharger. + Mettre les cookies dans prowlarr",
     "host_permissions": ["<all_urls>"],
     "permissions": [
       "activeTab",
