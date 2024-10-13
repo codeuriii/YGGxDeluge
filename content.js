@@ -93,4 +93,6 @@ function createProwlarrButton() {
 if (element) {
     createDelugeButton(element)
 }
-createProwlarrButton()
+if (location.pathname !== "/auth/login") {
+    createProwlarrButton()
+}
