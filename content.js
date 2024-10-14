@@ -93,6 +93,6 @@ function createProwlarrButton() {
 if (element) {
     createDelugeButton(element)
 }
-if (location.pathname !== "/auth/login") {
+if (!location.pathname.includes("/auth") && !location.href.includes("/forum")) {
     createProwlarrButton()
 }
