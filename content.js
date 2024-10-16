@@ -90,8 +90,50 @@ function createProwlarrButton() {
     document.body.appendChild(prowlarrButton)
 }
 
+function createCopyCookiesButton(element) {
+    const copyCookiesButton = document.createElement("a");
+    copyCookiesButton.className = "butt";
+    copyCookiesButton.textContent = "Copier les cookies";
+    copyCookiesButton.style.borderColor = "#ff69b4";
+    copyCookiesButton.style.color = "white";
+    copyCookiesButton.style.marginLeft = "10px";
+    copyCookiesButton.addEventListener("mouseenter", () => {
+        copyCookiesButton.style.backgroundColor = "#ff69b4";
+    });
+    copyCookiesButton.addEventListener("mouseleave", () => {
+        copyCookiesButton.style.backgroundColor = element.style.color
+    });
+    copyCookiesButton.addEventListener("click", () => {
+        requestCookies();
+    });
+    element.parentElement.appendChild(copyCookiesButton);
+}
+
+function requestCookies() {
+    chrome.runtime.sendMessage(
+        {
+            action: "getCookies"
+        },
+        (response) => {
+            if (response && response.cookies) {
+                copyToClipboard(response.cookies);
+            }
+        }
+    );
+}
+
+function copyToClipboard(text) {
+    // Utilisation de l'API Navigator.clipboard pour copier dans le presse-papier
+    navigator.clipboard.writeText(text).then(() => {
+        console.log("Cookies copiés dans le presse-papier !");
+    }).catch(err => {
+        console.error("Erreur lors de la copie des cookies : ", err);
+    });
+}
+
 if (element) {
     createDelugeButton(element)
+    createCopyCookiesButton(element)
 }
 if (!location.pathname.includes("/auth") && !location.href.includes("/forum")) {
     createProwlarrButton()

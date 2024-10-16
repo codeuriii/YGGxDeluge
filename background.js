@@ -100,49 +100,77 @@ async function setLabel(torrentId, label) {
     });
 
     const data = await response.json();
-    return data.error;  // Renvoie `true` si le label est appliqué avec succès
+    return data.error;
 }
 
-// Écoute les messages envoyés depuis content.js
-chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "addTorrent") {
         const { link, label } = message;
 
-        // Connexion à l'API de Deluge
-        const connected = await connectToDeluge();
-        if (!connected) {
-            console.error("Connexion à Deluge échouée");
-            sendResponse({ status: "Erreur de connexion" });
-            return;
-        }
-
-        // Ajout du torrent avec l'URL et les cookies
-        const torrentId = await addTorrent("https://ygg.re" + link, await getCookie("ygg_", "https://ygg.re"));
-        if (torrentId) {
-            console.log("Torrent ajouté avec succès:", torrentId);
-
-            // Ajout du label si disponible
-            if (label) {
-                const labelSet = await setLabel(torrentId, label);
-                if (!labelSet) {
-                    console.log("Label ajouté:", label);
-                } else {
-                    console.error("Erreur lors de l'ajout du label");
-                }
-            }
-
-            sendResponse({ status: "Torrent ajouté et label appliqué" });
-        } else {
-            console.error("Erreur lors de l'ajout du torrent");
+        // Connexion à l'API de Deluge et ajout du torrent
+        handleAddTorrent(link, label).then(response => {
+            sendResponse(response);
+        }).catch(error => {
+            console.error("Erreur dans addTorrent:", error);
             sendResponse({ status: "Erreur lors de l'ajout du torrent" });
-        }
+        });
+
+        // Indiquer que la réponse sera envoyée de manière asynchrone
+        return true;
     }
 
     // Prowlarr part
     else if (message.action === "prowlarr") {
-        updateProwlarrIndexer()
+        updateProwlarrIndexer();
+        sendResponse({ status: "Prowlarr mis à jour" });
+    }
+
+    // Gestion de la récupération des cookies
+    else if (message.action === "getCookies") {
+        getCookie("ygg_", "https://ygg.re").then(myCookies => {
+            sendResponse({ cookies: `account_created=true; ygg_=${myCookies}` });
+        }).catch(error => {
+            console.error("Erreur lors de la récupération des cookies:", error);
+            sendResponse({ cookies: null });
+        });
+
+        // Indiquer que la réponse sera envoyée de manière asynchrone
+        return true;
     }
 });
+
+// Fonction asynchrone pour gérer l'ajout d'un torrent à Deluge
+async function handleAddTorrent(link, label) {
+    // Connexion à l'API de Deluge
+    const connected = await connectToDeluge();
+    if (!connected) {
+        console.error("Connexion à Deluge échouée");
+        return { status: "Erreur de connexion" };
+    }
+
+    // Ajout du torrent avec l'URL et les cookies
+    const torrentId = await addTorrent("https://ygg.re" + link, await getCookie("ygg_", "https://ygg.re"));
+    if (torrentId) {
+        console.log("Torrent ajouté avec succès:", torrentId);
+
+        // Ajout du label si disponible
+        if (label) {
+            const labelSet = await setLabel(torrentId, label);
+            if (!labelSet) {
+                console.log("Label ajouté:", label);
+            } else {
+                console.error("Erreur lors de l'ajout du label");
+                return { status: "Erreur lors de l'ajout du label" };
+            }
+        }
+
+        return { status: "Torrent ajouté et label appliqué" };
+    } else {
+        console.error("Erreur lors de l'ajout du torrent");
+        return { status: "Erreur lors de l'ajout du torrent" };
+    }
+}
+
 
 async function getCookie(cookieName, domainUrl) {
     return await new Promise((resolve, reject) => {
