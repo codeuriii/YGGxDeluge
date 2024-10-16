@@ -50,8 +50,17 @@ async function addTorrent(link, cookies) {
     // Convertir l'ArrayBuffer en un tableau d'octets (bytes)
     const torrentFileBytes = new Uint8Array(arrayBuffer);
 
-    // Convertir les octets en un tableau de base64 pour que Deluge les traite comme un fichier valide
-    const torrentBase64 = btoa(String.fromCharCode.apply(null, torrentFileBytes));
+    function byteArrayToBase64(byteArray) {
+        let binaryString = '';
+        const chunkSize = 8192; // Adjust chunk size as needed for memory limits
+        for (let i = 0; i < byteArray.length; i += chunkSize) {
+            const chunk = byteArray.subarray(i, i + chunkSize);
+            binaryString += String.fromCharCode.apply(null, chunk);
+        }
+        return btoa(binaryString);
+    }
+    
+    const torrentBase64 = byteArrayToBase64(torrentFileBytes);
 
     const url = `${delugeConfig.host}:${delugeConfig.port}/json`;
 
