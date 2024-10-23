@@ -26,7 +26,8 @@ function getCategorie() {
         "2184": "sonarr",
         "2179": "sonarr",
         "2178": "radarr",
-        "2148": "lidarr"
+        "2148": "lidarr",
+        "2182": "sonarr"
     }
     const div = document.querySelector("div.tag")
     const regexp = /tag_subcat_(\d+)/
