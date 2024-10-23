@@ -16,6 +16,10 @@ function createDelugeButton(element) {
     })
     myButton.addEventListener("click", () => {
         addTorrentToDeluge(getTorrentLink(), getCategorie())
+        myButton.style.transform = "scale(.9)"
+        setTimeout(() => {
+            myButton.style.transform = "scale(1)"
+        }, 300);
     })
     element.parentElement.appendChild(myButton)
 }
